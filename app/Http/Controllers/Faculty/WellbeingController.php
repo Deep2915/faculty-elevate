@@ -47,6 +47,6 @@ class WellbeingController extends Controller
         // Burnout alert notification disabled (Notifiable trait removed — no SQL connection)
         // HOD would be notified here if burnout_index < 40 for 2 consecutive surveys
 
-        return back()->with('status', 'Wellbeing survey submitted. Thank you! ❤️');
+        return back()->with('status', 'Wellbeing survey submitted. Thank you!');
     }
 }

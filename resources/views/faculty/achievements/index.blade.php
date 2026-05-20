@@ -41,11 +41,11 @@
     <div class="glass-card">
         @forelse($achievements as $ach)
         @php
-            $icons = ['publication'=>['icon'=>'📄','color'=>'rgba(99,102,241,0.2)','pill'=>'pill-indigo'],
-                      'patent'     =>['icon'=>'💡','color'=>'rgba(245,158,11,0.2)','pill'=>'pill-amber'],
-                      'award'      =>['icon'=>'🏆','color'=>'rgba(16,185,129,0.2)','pill'=>'pill-green'],
-                      'certification'=>['icon'=>'🎓','color'=>'rgba(6,182,212,0.2)','pill'=>'pill-cyan']];
-            $meta = $icons[$ach->type] ?? ['icon'=>'✨','color'=>'rgba(99,102,241,0.2)','pill'=>'pill-gray'];
+            $icons = ['publication'=>['icon'=>'PUB','color'=>'rgba(99,102,241,0.2)','pill'=>'pill-indigo'],
+                      'patent'     =>['icon'=>'PAT','color'=>'rgba(245,158,11,0.2)','pill'=>'pill-amber'],
+                      'award'      =>['icon'=>'AWD','color'=>'rgba(16,185,129,0.2)','pill'=>'pill-green'],
+                      'certification'=>['icon'=>'CERT','color'=>'rgba(6,182,212,0.2)','pill'=>'pill-cyan']];
+            $meta = $icons[$ach->type] ?? ['icon'=>'OTH','color'=>'rgba(99,102,241,0.2)','pill'=>'pill-gray'];
         @endphp
         <div style="display:flex; gap:1.25rem; padding:1rem 0; border-bottom:1px solid rgba(255,255,255,0.04);">
             <div style="width:48px; height:48px; border-radius:14px; background:{{ $meta['color'] }}; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0;">{{ $meta['icon'] }}</div>
@@ -71,7 +71,7 @@
         </div>
         @empty
         <div style="text-align:center; padding:3rem; color:var(--text-muted);">
-            <div style="font-size:2.5rem; margin-bottom:0.75rem;">🏅</div>
+            <div style="font-size:1.5rem; font-weight:800; color:var(--brand-400); margin-bottom:0.75rem;">&#9733;</div>
             No achievements logged yet. Add your publications, patents, or awards!
         </div>
         @endforelse
@@ -81,16 +81,16 @@
     {{-- CREATE MODAL --}}
     <div id="createAchModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
         <div class="modal-box">
-            <div class="modal-title">🏅 Log Achievement</div>
+            <div class="modal-title">Log Achievement</div>
             <form method="POST" action="{{ route('faculty.achievements.store') }}">
                 @csrf
                 <div class="form-grid" style="grid-template-columns:1fr 1fr; margin-bottom:1rem;">
                     <div class="form-group"><label>Type</label>
                         <select name="type" required>
-                            <option value="publication">📄 Publication</option>
-                            <option value="patent">💡 Patent</option>
-                            <option value="award">🏆 Award</option>
-                            <option value="certification">🎓 Certification</option>
+                            <option value="publication">Publication</option>
+                            <option value="patent">Patent</option>
+                            <option value="award">Award</option>
+                            <option value="certification">Certification</option>
                         </select>
                     </div>
                     <div class="form-group"><label>Date</label><input type="date" name="date" required></div>

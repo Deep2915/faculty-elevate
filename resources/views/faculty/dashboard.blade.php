@@ -51,7 +51,7 @@
         {{-- Evaluation History Chart --}}
         <div class="glass-card">
             <div class="section-header">
-                <span class="section-title">📈 Evaluation History</span>
+                <span class="section-title">Evaluation History</span>
                 <span class="pill pill-indigo">Published</span>
             </div>
             @if($evaluations->isNotEmpty())
@@ -64,14 +64,16 @@
         {{-- Recommendations --}}
         <div class="glass-card">
             <div class="section-header">
-                <span class="section-title">💡 AI Recommendations</span>
+                <span class="section-title">Recommendations</span>
                 <span class="pill pill-cyan">Smart Engine</span>
             </div>
             @if(!empty($recommendations['workshops']))
                 <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.08em;">Suggested Workshops</div>
                 @foreach($recommendations['workshops'] as $ws)
                 <div style="display:flex; align-items:center; gap:0.75rem; padding:0.625rem 0; border-bottom:1px solid rgba(255,255,255,0.04);">
-                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(99,102,241,0.15);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">📚</div>
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(99,102,241,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <svg width="16" height="16" fill="none" stroke="#818cf8" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    </div>
                     <div>
                         <div style="font-size:0.8125rem; font-weight:600; color:var(--text-primary);">{{ $ws->title }}</div>
                         <div style="font-size:0.72rem; color:var(--text-muted);">{{ ucfirst($ws->category) }} · +{{ $ws->xp_reward }} XP</div>
@@ -84,18 +86,18 @@
                 <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.875rem; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.08em;">Suggested Certifications</div>
                 @foreach($recommendations['certifications'] as $cert)
                 <div style="display:flex; align-items:center; gap:0.5rem; padding:0.5rem 0;">
-                    <span style="color:var(--accent-amber);">🎓</span>
+                    <span style="color:var(--accent-amber); font-weight:700; font-size:.85rem;">&#10022;</span>
                     <span style="font-size:0.8125rem; color:var(--text-secondary);">{{ $cert }}</span>
                 </div>
                 @endforeach
             @endif
             @if(!empty($recommendations['skill_gaps']))
                 @foreach($recommendations['skill_gaps'] as $gap)
-                <div style="background:rgba(244,63,94,0.08); border:1px solid rgba(244,63,94,0.2); border-radius:8px; padding:0.625rem 0.875rem; font-size:0.8125rem; color:#fda4af; margin-top:0.5rem;">⚠️ {{ $gap }}</div>
+                <div style="background:rgba(244,63,94,0.08); border:1px solid rgba(244,63,94,0.2); border-radius:8px; padding:0.625rem 0.875rem; font-size:0.8125rem; color:#fda4af; margin-top:0.5rem;">Note: {{ $gap }}</div>
                 @endforeach
             @endif
             @if(empty($recommendations['workshops']) && empty($recommendations['certifications']) && empty($recommendations['skill_gaps']))
-            <div style="text-align:center; padding:2rem; color:var(--text-muted);">✅ Great work! No immediate recommendations.</div>
+            <div style="text-align:center; padding:2rem; color:var(--text-muted);">Great work! No immediate recommendations.</div>
             @endif
         </div>
     </div>
@@ -105,13 +107,13 @@
         {{-- Activity Timeline --}}
         <div class="glass-card">
             <div class="section-header">
-                <span class="section-title">🕐 Recent Activity</span>
+                <span class="section-title">Recent Activity</span>
                 <a href="{{ route('faculty.achievements.index') }}" class="btn btn-ghost btn-xs">View All</a>
             </div>
             @forelse($achievements as $ach)
             <div class="timeline-item">
                 <div class="timeline-dot" style="background:rgba(99,102,241,0.2);color:var(--brand-400);">
-                    {{ ['publication'=>'📄','patent'=>'💡','award'=>'🏆','certification'=>'🎓'][$ach->type] ?? '✨' }}
+                    {{ ['publication'=>'PUB','patent'=>'PAT','award'=>'AWD','certification'=>'CERT'][$ach->type] ?? '&#9733;' }}
                 </div>
                 <div class="timeline-body">
                     <div style="font-size:0.8125rem; font-weight:600; color:var(--text-primary);">{{ $ach->title }}</div>
@@ -127,7 +129,7 @@
         {{-- Wellbeing Trend --}}
         <div class="glass-card">
             <div class="section-header">
-                <span class="section-title">❤️ Wellbeing Trend</span>
+                <span class="section-title">Wellbeing Trend</span>
                 <a href="{{ route('faculty.wellbeing') }}" class="btn btn-primary btn-xs">Check In</a>
             </div>
             @if($wellbeingData->isNotEmpty())
@@ -146,50 +148,92 @@
 
     @if($evaluations->isNotEmpty())
     @php
-        $evalLabels   = $evaluations->reverse()->pluck('period')->values();
-        $evalResearch = $evaluations->reverse()->values()->map(function($e){ return round(((float)data_get($e,'scores.research',0))*100,1); });
-        $evalTeaching = $evaluations->reverse()->values()->map(function($e){ return round(((float)data_get($e,'scores.teaching',0))*100,1); });
-        $evalInnov    = $evaluations->reverse()->values()->map(function($e){ return round(((float)data_get($e,'scores.innovation',0))*100,1); });
+        $evalsSorted  = $evaluations->sortBy('created_at')->values();
+        $evalLabels   = $evalsSorted->pluck('period');
+        $evalResearch = $evalsSorted->map(fn($e) => round((float)data_get($e->scores, 'research', 0) * 100, 1));
+        $evalTeaching = $evalsSorted->map(fn($e) => round((float)data_get($e->scores, 'teaching', 0) * 100, 1));
+        $evalInnov    = $evalsSorted->map(fn($e) => round((float)data_get($e->scores, 'innovation', 0) * 100, 1));
     @endphp
     new Chart(document.getElementById('evalChart'), {
         type: 'line',
         data: {
-            labels: {{ json_encode($evalLabels) }},
+            labels: @json($evalLabels),
             datasets: [
-                { label: 'Research',   data: {{ json_encode($evalResearch) }}, borderColor:'#818cf8', tension:0.4, fill:false, pointRadius:4 },
-                { label: 'Teaching',   data: {{ json_encode($evalTeaching) }}, borderColor:'#10b981', tension:0.4, fill:false, pointRadius:4 },
-                { label: 'Innovation', data: {{ json_encode($evalInnov) }},    borderColor:'#f59e0b', tension:0.4, fill:false, pointRadius:4 },
+                {
+                    label: 'Research',
+                    data: @json($evalResearch),
+                    borderColor:'#818cf8', backgroundColor:'rgba(129,140,248,0.08)',
+                    tension:0.4, fill:true, pointRadius:5, pointBackgroundColor:'#818cf8',
+                    pointHoverRadius:7,
+                },
+                {
+                    label: 'Teaching',
+                    data: @json($evalTeaching),
+                    borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.08)',
+                    tension:0.4, fill:true, pointRadius:5, pointBackgroundColor:'#10b981',
+                    pointHoverRadius:7,
+                },
+                {
+                    label: 'Innovation',
+                    data: @json($evalInnov),
+                    borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.08)',
+                    tension:0.4, fill:true, pointRadius:5, pointBackgroundColor:'#f59e0b',
+                    pointHoverRadius:7,
+                },
             ]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12 } } },
-            scales: { y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.04)' } }, x: { grid: { display: false } } }
+            interaction: { mode:'index', intersect:false },
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 14, font: { size: 11 } } },
+                tooltip: {
+                    callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.parsed.y + '%' }
+                }
+            },
+            scales: {
+                y: { min: 0, max: 100, ticks: { callback: v => v + '%', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+                x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+            }
         }
     });
     @endif
 
     @if($wellbeingData->isNotEmpty())
     @php
-        $wbLabels = $wellbeingData->map(function($s){ return optional($s->surveyed_at)->format('d M'); });
-        $wbData   = $wellbeingData->pluck('burnout_index');
+        $wbLabels = $wellbeingData->map(function($s) {
+            $dt = $s->surveyed_at;
+            if ($dt instanceof \Carbon\Carbon) return $dt->format('d M');
+            if (is_array($dt) && isset($dt['$date'])) return \Carbon\Carbon::parse($dt['$date'])->format('d M');
+            if (is_string($dt)) return \Carbon\Carbon::parse($dt)->format('d M');
+            return '—';
+        });
+        $wbData = $wellbeingData->map(fn($s) => max(0, min(100, (float)($s->burnout_index ?? 0))));
     @endphp
     new Chart(document.getElementById('wellbeingChart'), {
         type: 'line',
         data: {
-            labels: {{ json_encode($wbLabels) }},
+            labels: @json($wbLabels),
             datasets: [{
                 label: 'Wellbeing Score',
-                data: {{ json_encode($wbData) }},
+                data: @json($wbData),
                 borderColor: '#f43f5e',
-                backgroundColor: 'rgba(244,63,94,0.08)',
-                tension: 0.4, fill: true, pointRadius: 4,
+                backgroundColor: 'rgba(244,63,94,0.1)',
+                tension: 0.4, fill: true,
+                pointRadius: 5, pointBackgroundColor:'#f43f5e', pointHoverRadius:7,
+                borderWidth: 2,
             }]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.04)' } }, x: { grid: { display: false } } }
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => ' Score: ' + ctx.parsed.y } }
+            },
+            scales: {
+                y: { min: 0, max: 100, ticks: { font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+                x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+            }
         }
     });
     @endif

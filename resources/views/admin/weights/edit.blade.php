@@ -5,7 +5,7 @@
         <div class="glass-card">
             <div class="section-header" style="margin-bottom:1.75rem;">
                 <div>
-                    <div class="section-title">⚖️ Performance Index Weights</div>
+                    <div class="section-title">Performance Index Weights</div>
                     <div style="font-size:0.8125rem; color:var(--text-muted); margin-top:0.25rem;">Adjust how each category contributes to the faculty Performance Index. Total must equal 100%.</div>
                 </div>
             </div>

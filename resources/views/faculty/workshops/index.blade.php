@@ -3,7 +3,7 @@
 
     {{-- Status Tabs --}}
     <div style="display:flex; gap:0.5rem; margin-bottom:1.25rem; flex-wrap:wrap;">
-        @foreach(['upcoming'=>'🔜 Upcoming','ongoing'=>'🔴 Ongoing','completed'=>'✅ Completed'] as $s => $label)
+        @foreach(['upcoming'=>'Upcoming','ongoing'=>'Ongoing','completed'=>'Completed'] as $s => $label)
         <a href="{{ route('faculty.workshops.index', ['status'=>$s]) }}"
            class="btn {{ request('status',$s==='upcoming'?'upcoming':'')!=='' && request('status')===$s ? 'btn-primary' : 'btn-ghost' }}"
            style="{{ request('status','upcoming')===$s ? '' : 'opacity:0.7;' }}">
@@ -18,7 +18,9 @@
         <div class="glass-card" style="display:flex; flex-direction:column;">
             {{-- Header --}}
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.875rem;">
-                <div style="width:44px;height:44px;border-radius:12px;background:rgba(99,102,241,0.15);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">📚</div>
+                <div style="width:44px;height:44px;border-radius:12px;background:rgba(99,102,241,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="20" height="20" fill="none" stroke="#818cf8" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                </div>
                 <span class="pill {{ $ws->status==='upcoming'?'pill-indigo':($ws->status==='ongoing'?'pill-amber':'pill-green') }}">
                     {{ ucfirst($ws->status) }}
                 </span>
@@ -31,9 +33,9 @@
             {{-- Meta Pills --}}
             <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:1rem;">
                 <span class="pill pill-cyan">{{ $ws->category }}</span>
-                <span class="pill pill-gray">📅 {{ optional($ws->schedule_date)->format('d M Y') }}</span>
-                <span class="pill pill-gray">⏱ {{ $ws->duration_hours }}h</span>
-                <span class="pill pill-gray">👥 {{ $ws->capacity }} seats</span>
+                <span class="pill pill-gray">{{ optional($ws->schedule_date)->format('d M Y') }}</span>
+                <span class="pill pill-gray">{{ $ws->duration_hours }}h</span>
+                <span class="pill pill-gray">{{ $ws->capacity }} seats</span>
                 <span class="pill pill-amber">+{{ $ws->xp_reward }} XP</span>
             </div>
 
@@ -42,7 +44,7 @@
             <form method="POST" action="{{ route('faculty.workshops.register', $ws->id) }}">
                 @csrf
                 <button class="btn btn-primary" style="width:100%;">
-                    ✅ Register & Earn {{ $ws->xp_reward }} XP
+                    Register & Earn {{ $ws->xp_reward }} XP
                 </button>
             </form>
             @else
@@ -51,7 +53,7 @@
         </div>
         @empty
         <div class="glass-card" style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">
-            <div style="font-size:2.5rem; margin-bottom:0.75rem;">📭</div>
+            <div style="font-size:2rem; margin-bottom:0.75rem; color:var(--brand-400);">&#128236;</div>
             No {{ $status }} workshops available. Check back soon!
         </div>
         @endforelse

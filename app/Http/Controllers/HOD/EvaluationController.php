@@ -4,8 +4,10 @@ namespace App\Http\Controllers\HOD;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreEvaluationRequest;
+use App\Models\ClassLog;
 use App\Models\Evaluation;
 use App\Models\FacultyProfile;
+use App\Models\StudentFeedback;
 use App\Models\User;
 use App\Notifications\EvaluationPublishedNotification;
 use App\Services\GamificationService;
@@ -68,41 +70,55 @@ class EvaluationController extends Controller
     ): RedirectResponse
     {
         $validated = $request->validated();
+        $facultyId = $validated['faculty_id'];
+
+        // Auto-populate scores from real data if not manually overridden
+        $attendanceScore   = ClassLog::computeScore($facultyId)['score'];
+        $clarityScore      = StudentFeedback::computeClarityScore($facultyId);
+
+        $scores = array_merge([
+            'attendance'     => $attendanceScore,
+            'student_clarity'=> $clarityScore,
+        ], $validated['scores'] ?? []);
+
+        // If manually provided, use those instead
+        if (!empty($validated['scores']['attendance'])) {
+            $scores['attendance'] = (float) $validated['scores']['attendance'];
+        }
+        if (!empty($validated['scores']['student_clarity'])) {
+            $scores['student_clarity'] = (float) $validated['scores']['student_clarity'];
+        }
+
         $weightedScore = (
-            ((float) ($validated['scores']['research'] ?? 0)) +
-            ((float) ($validated['scores']['teaching'] ?? 0)) +
-            ((float) ($validated['scores']['innovation'] ?? 0))
+            ((float) ($scores['research'] ?? 0)) +
+            ((float) ($scores['teaching'] ?? 0)) +
+            ((float) ($scores['innovation'] ?? 0))
         ) / 3;
 
         Evaluation::create([
             ...$validated,
-            'evaluator_id' => (string) auth()->id(),
+            'scores'         => $scores,
+            'evaluator_id'   => (string) auth()->id(),
             'weighted_score' => (float) $weightedScore,
         ]);
 
-        $profile = FacultyProfile::firstWhere('user_id', $validated['faculty_id']);
+        $profile = FacultyProfile::firstWhere('user_id', $facultyId);
         if ($profile) {
-            $profile->research_score = (float) ($validated['scores']['research'] ?? 0);
-            $profile->teaching_score = (float) ($validated['scores']['teaching'] ?? 0);
-            $profile->innovation_score = (float) ($validated['scores']['innovation'] ?? 0);
+            $profile->research_score   = (float) ($scores['research'] ?? 0);
+            $profile->teaching_score   = (float) ($scores['teaching'] ?? 0);
+            $profile->innovation_score = (float) ($scores['innovation'] ?? 0);
             $performanceIndexService->calculate($profile);
 
             if ((float) $weightedScore >= 0.8) {
-                $faculty = User::find($validated['faculty_id']);
+                $faculty = User::find($facultyId);
                 if ($faculty) {
                     $gamificationService->awardXP($faculty, 50, 'Strong evaluation performance');
                 }
             }
         }
 
-        if (($validated['status'] ?? 'draft') === 'published') {
-            // Notification disabled: Notifiable trait removed (no SQL connection)
-            // $faculty = User::find($validated['faculty_id']);
-            // if ($faculty) { $faculty->notify(new EvaluationPublishedNotification()); }
-        }
-
         return redirect()->route('hod.evaluations.index')
-            ->with('status', 'Evaluation saved.');
+            ->with('status', 'Evaluation saved. Attendance & student clarity scores auto-populated from real data.');
     }
 
     /**
@@ -132,28 +148,46 @@ class EvaluationController extends Controller
     ): RedirectResponse
     {
         $evaluation = Evaluation::query()->findOrFail($id);
-        $validated = $request->validated();
+        $validated  = $request->validated();
+        $facultyId  = $validated['faculty_id'];
+
+        // Refresh auto-computed scores
+        $attendanceScore = ClassLog::computeScore($facultyId)['score'];
+        $clarityScore    = StudentFeedback::computeClarityScore($facultyId);
+
+        $scores = array_merge([
+            'attendance'      => $attendanceScore,
+            'student_clarity' => $clarityScore,
+        ], $validated['scores'] ?? []);
+
+        if (!empty($validated['scores']['attendance'])) {
+            $scores['attendance'] = (float) $validated['scores']['attendance'];
+        }
+        if (!empty($validated['scores']['student_clarity'])) {
+            $scores['student_clarity'] = (float) $validated['scores']['student_clarity'];
+        }
 
         $weightedScore = (
-            ((float) ($validated['scores']['research'] ?? 0)) +
-            ((float) ($validated['scores']['teaching'] ?? 0)) +
-            ((float) ($validated['scores']['innovation'] ?? 0))
+            ((float) ($scores['research'] ?? 0)) +
+            ((float) ($scores['teaching'] ?? 0)) +
+            ((float) ($scores['innovation'] ?? 0))
         ) / 3;
 
         $evaluation->update([
             ...$validated,
+            'scores'         => $scores,
             'weighted_score' => (float) $weightedScore,
         ]);
 
-        $profile = FacultyProfile::firstWhere('user_id', $validated['faculty_id']);
+        $profile = FacultyProfile::firstWhere('user_id', $facultyId);
         if ($profile) {
-            $profile->research_score = (float) ($validated['scores']['research'] ?? 0);
-            $profile->teaching_score = (float) ($validated['scores']['teaching'] ?? 0);
-            $profile->innovation_score = (float) ($validated['scores']['innovation'] ?? 0);
+            $profile->research_score   = (float) ($scores['research'] ?? 0);
+            $profile->teaching_score   = (float) ($scores['teaching'] ?? 0);
+            $profile->innovation_score = (float) ($scores['innovation'] ?? 0);
             $performanceIndexService->calculate($profile);
 
             if ((float) $weightedScore >= 0.8) {
-                $faculty = User::find($validated['faculty_id']);
+                $faculty = User::find($facultyId);
                 if ($faculty) {
                     $gamificationService->awardXP($faculty, 50, 'Strong evaluation performance');
                 }

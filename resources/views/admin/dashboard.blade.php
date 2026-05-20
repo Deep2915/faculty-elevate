@@ -79,7 +79,7 @@
         {{-- Top Performers --}}
         <div class="glass-card">
             <div class="section-header">
-                <span class="section-title">🏆 Top Performers</span>
+                <span class="section-title">Top Performers</span>
                 <a href="{{ route('admin.users.index') }}" class="btn btn-ghost btn-xs">View All</a>
             </div>
             <table class="data-table">
@@ -90,9 +90,9 @@
                     @foreach($topPerformers as $i => $profile)
                     <tr>
                         <td>
-                            @if($i===0) <span class="rank-1">🥇 1</span>
-                            @elseif($i===1) <span class="rank-2">🥈 2</span>
-                            @elseif($i===2) <span class="rank-3">🥉 3</span>
+                            @if($i===0) <span class="rank-1">#1</span>
+                            @elseif($i===1) <span class="rank-2">#2</span>
+                            @elseif($i===2) <span class="rank-3">#3</span>
                             @else <span style="color:var(--text-muted);">{{ $i+1 }}</span>
                             @endif
                         </td>

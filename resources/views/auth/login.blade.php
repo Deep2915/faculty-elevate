@@ -9,7 +9,8 @@
         </div>
         <h2 class="auth-title">Welcome Back</h2>
         <p class="auth-subtitle">
-            Don't have an account? <a href="{{ route('register') }}">Create one free</a>
+            Access is provided by your administrator.
+            <span style="color:var(--text-muted);">Check your email for credentials.</span>
         </p>
     </div>
 

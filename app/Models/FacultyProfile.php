@@ -22,6 +22,7 @@ class FacultyProfile extends BaseMongoModel
         'xp',
         'level',
         'rank',
+        'feedback_token',
     ];
 
     protected $casts = [

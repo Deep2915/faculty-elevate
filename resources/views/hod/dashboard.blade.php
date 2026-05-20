@@ -42,7 +42,7 @@
         {{-- Performance Chart --}}
         <div class="glass-card">
             <div class="section-header">
-                <span class="section-title">📊 Faculty Performance Index</span>
+                <span class="section-title">Faculty Performance Index</span>
                 <a href="{{ route('hod.evaluations.index') }}" class="btn btn-ghost btn-xs">Evaluate</a>
             </div>
             <div class="chart-container" style="height:260px;">
@@ -53,7 +53,7 @@
         {{-- Burnout Alerts --}}
         <div class="glass-card">
             <div class="section-header">
-                <span class="section-title">🚨 Burnout Alerts</span>
+                <span class="section-title">Burnout Alerts</span>
                 <span class="pill pill-rose">Wellbeing</span>
             </div>
             @forelse($burnoutAlerts as $alert)
@@ -69,7 +69,7 @@
             </div>
             @empty
             <div style="text-align:center; padding:2rem; color:var(--text-muted); font-size:0.875rem;">
-                ✅ No burnout alerts — department is healthy!
+                All clear — department is healthy!
             </div>
             @endforelse
         </div>
@@ -78,7 +78,7 @@
     {{-- Top Performers Table --}}
     <div class="glass-card">
         <div class="section-header">
-            <span class="section-title">🏆 Department Leaderboard</span>
+            <span class="section-title">Department Leaderboard</span>
             <a href="{{ route('hod.leaderboard') }}" class="btn btn-ghost btn-xs">Full View →</a>
         </div>
         <table class="data-table">
@@ -94,9 +94,9 @@
                 @foreach($topFaculty as $i => $p)
                 <tr>
                     <td style="padding-left:1.5rem;">
-                        @if($i===0)<span class="rank-1">🥇</span>
-                        @elseif($i===1)<span class="rank-2">🥈</span>
-                        @elseif($i===2)<span class="rank-3">🥉</span>
+                        @if($i===0)<span class="rank-1">1st</span>
+                        @elseif($i===1)<span class="rank-2">2nd</span>
+                        @elseif($i===2)<span class="rank-3">3rd</span>
                         @else<span style="color:var(--text-muted);">{{ $i+1 }}</span>@endif
                     </td>
                     <td>

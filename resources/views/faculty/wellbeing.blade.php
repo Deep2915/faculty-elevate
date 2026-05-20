@@ -5,17 +5,17 @@
         {{-- Survey Form --}}
         <div class="glass-card">
             <div class="section-header" style="margin-bottom:1.5rem;">
-                <span class="section-title">❤️ How are you feeling?</span>
+                <span class="section-title">How are you feeling?</span>
                 <span class="pill pill-rose">Survey</span>
             </div>
             <form method="POST" action="{{ route('faculty.wellbeing.store') }}" id="wellbeingForm">
                 @csrf
                 @php
                     $sliders = [
-                        'workload'   => ['label'=>'Workload', 'desc'=>'How manageable is your current workload?', 'icon'=>'📋'],
-                        'stress'     => ['label'=>'Stress Level', 'desc'=>'Rate your current stress level (1=low, 10=high)', 'icon'=>'😓'],
-                        'motivation' => ['label'=>'Motivation', 'desc'=>'How motivated do you feel about your work?', 'icon'=>'⚡'],
-                        'support'    => ['label'=>'Support', 'desc'=>'Do you feel supported by your institution?', 'icon'=>'🤝'],
+                        'workload'   => ['label'=>'Workload', 'desc'=>'How manageable is your current workload?', 'icon'=>'W'],
+                        'stress'     => ['label'=>'Stress Level', 'desc'=>'Rate your current stress level (1=low, 10=high)', 'icon'=>'S'],
+                        'motivation' => ['label'=>'Motivation', 'desc'=>'How motivated do you feel about your work?', 'icon'=>'M'],
+                        'support'    => ['label'=>'Support', 'desc'=>'Do you feel supported by your institution?', 'icon'=>'S+'],
                     ];
                 @endphp
 
@@ -45,7 +45,7 @@
                 <div id="burnoutBox" style="border-radius:10px; padding:0.875rem; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); margin-bottom:1.25rem; text-align:center;">
                     <div style="font-size:0.8125rem; color:var(--text-muted);">Estimated Wellbeing Score</div>
                     <div id="burnoutVal" style="font-size:1.75rem; font-weight:800; color:#10b981;">75%</div>
-                    <div id="burnoutLabel" style="font-size:0.75rem; color:var(--text-muted);">Looking Good! 🌟</div>
+                    <div id="burnoutLabel" style="font-size:0.75rem; color:var(--text-muted);">Looking Good!</div>
                 </div>
 
                 <button type="submit" class="btn btn-primary" style="width:100%;">Submit Check-In</button>
@@ -55,7 +55,7 @@
         {{-- Trend Chart --}}
         <div class="glass-card">
             <div class="section-header" style="margin-bottom:1.25rem;">
-                <span class="section-title">📊 Wellbeing Trend</span>
+                <span class="section-title">Wellbeing Trend</span>
                 <span class="pill pill-indigo">Last 10</span>
             </div>
             @if($surveys->isNotEmpty())
@@ -74,7 +74,7 @@
             </div>
             @else
             <div style="text-align:center; padding:3rem; color:var(--text-muted);">
-                <div style="font-size:2.5rem; margin-bottom:0.75rem;">📊</div>
+                <div style="font-size:1.5rem; font-weight:800; color:var(--brand-400); margin-bottom:0.75rem;">&#9643;</div>
                 Complete your first check-in to see trends here.
             </div>
             @endif
@@ -97,13 +97,13 @@
         const val = document.getElementById('burnoutVal');
         if (wellbeing >= 70) {
             box.style.background='rgba(16,185,129,0.1)'; box.style.border='1px solid rgba(16,185,129,0.3)';
-            val.style.color='#10b981'; lbl.textContent='Looking Good! 🌟';
+            val.style.color='#10b981'; lbl.textContent='Looking Good!';
         } else if (wellbeing >= 40) {
             box.style.background='rgba(245,158,11,0.1)'; box.style.border='1px solid rgba(245,158,11,0.3)';
-            val.style.color='#f59e0b'; lbl.textContent='Moderate stress — keep an eye out ⚠️';
+            val.style.color='#f59e0b'; lbl.textContent='Moderate stress — keep an eye out';
         } else {
             box.style.background='rgba(244,63,94,0.1)'; box.style.border='1px solid rgba(244,63,94,0.3)';
-            val.style.color='#f43f5e'; lbl.textContent='High burnout risk — please seek support 🚨';
+            val.style.color='#f43f5e'; lbl.textContent='High burnout risk — please seek support';
         }
     }
     updateBurnout();

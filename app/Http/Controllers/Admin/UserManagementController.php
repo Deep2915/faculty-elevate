@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\FacultyWelcomeMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class UserManagementController extends Controller
@@ -45,20 +48,44 @@ class UserManagementController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'role' => ['required', 'in:admin,hod,faculty'],
-            'password' => ['required', 'string', 'min:8'],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
+            'role'     => ['required', 'in:admin,hod,faculty'],
+            'password' => ['nullable', 'string', 'min:8'],
         ]);
 
-        User::query()->create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'role' => $data['role'],
-            'password' => Hash::make($data['password']),
+        // Use provided password or generate a secure one
+        $plainPassword = $data['password'] ?? Str::random(12);
+
+        $user = User::query()->create([
+            'name'     => $data['name'],
+            'email'    => $data['email'],
+            'role'     => $data['role'],
+            'password' => Hash::make($plainPassword),
         ]);
 
-        return redirect()->route('admin.users.index')->with('status', 'User created successfully.');
+        // Email credentials to the new user
+        $emailStatus = 'Credentials emailed to ' . $user->email . '.';
+        try {
+            Mail::to($user->email)->send(new FacultyWelcomeMail(
+                recipientName:  $user->name,
+                recipientEmail: $user->email,
+                plainPassword:  $plainPassword,
+                role:           $user->role,
+            ));
+        } catch (\Throwable $e) {
+            \Log::warning('Welcome email failed for '.$user->email.': '.$e->getMessage());
+            $emailStatus = 'Email delivery failed. Share credentials manually.';
+        }
+
+        return redirect()->route('admin.users.index')
+            ->with('status', "Account created for {$user->name}. {$emailStatus}")
+            ->with('new_credentials', [
+                'name'     => $user->name,
+                'email'    => $user->email,
+                'password' => $plainPassword,
+                'role'     => $user->role,
+            ]);
     }
 
     public function show(string $id): RedirectResponse
@@ -76,15 +103,15 @@ class UserManagementController extends Controller
         $user = User::query()->findOrFail($id);
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id.',_id'],
-            'role' => ['required', 'in:admin,hod,faculty'],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id.',_id'],
+            'role'     => ['required', 'in:admin,hod,faculty'],
             'password' => ['nullable', 'string', 'min:8'],
         ]);
 
-        $user->name = $data['name'];
+        $user->name  = $data['name'];
         $user->email = $data['email'];
-        $user->role = $data['role'];
+        $user->role  = $data['role'];
 
         if (! empty($data['password'])) {
             $user->password = Hash::make($data['password']);

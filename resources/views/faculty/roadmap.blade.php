@@ -10,7 +10,7 @@
 
     @if($goals->isEmpty())
     <div class="glass-card" style="text-align:center; padding:4rem;">
-        <div style="font-size:3rem; margin-bottom:1rem;">🗺️</div>
+        <div style="font-size:3rem; font-weight:800; color:var(--brand-400); margin-bottom:1rem;">&#9650;</div>
         <div style="font-size:1.125rem; font-weight:700; color:var(--text-primary); margin-bottom:0.5rem;">Your roadmap is empty</div>
         <div style="color:var(--text-muted); margin-bottom:1.5rem;">Start by adding professional goals and track your progress.</div>
         <button onclick="document.getElementById('createGoalModal').style.display='flex'" class="btn btn-primary">Add First Goal</button>
@@ -59,7 +59,7 @@
                     </div>
                     <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.375rem; flex-shrink:0;">
                         <span class="pill {{ $isDone?'pill-green':($isOver?'pill-rose':'pill-indigo') }}">
-                            {{ $isDone ? '✅ Completed' : ($isOver ? '⏰ Overdue' : '🔄 Active') }}
+                            {{ $isDone ? 'Completed' : ($isOver ? 'Overdue' : 'Active') }}
                         </span>
                         <span style="font-size:0.72rem; color:var(--text-muted);">Due: {{ \Carbon\Carbon::parse($goal->target_date)->format('d M Y') }}</span>
                     </div>
@@ -100,7 +100,7 @@
     {{-- CREATE GOAL MODAL --}}
     <div id="createGoalModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
         <div class="modal-box">
-            <div class="modal-title">🎯 New Professional Goal</div>
+            <div class="modal-title">New Professional Goal</div>
             <form method="POST" action="{{ route('faculty.goals.store') }}">
                 @csrf
                 <div style="display:flex; flex-direction:column; gap:0.875rem; margin-bottom:1.25rem;">

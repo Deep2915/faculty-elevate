@@ -371,6 +371,123 @@
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* ── Core Animations ─── */
   .animate-fade-in { animation: fadeIn 0.4s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .animate-fade-in-slow { animation: fadeIn 0.7s ease; }
+
+  /* Staggered children */
+  .stagger-children > * { opacity: 0; animation: staggerUp 0.5s ease forwards; }
+  .stagger-children > *:nth-child(1) { animation-delay: 0s; }
+  .stagger-children > *:nth-child(2) { animation-delay: 0.07s; }
+  .stagger-children > *:nth-child(3) { animation-delay: 0.14s; }
+  .stagger-children > *:nth-child(4) { animation-delay: 0.21s; }
+  .stagger-children > *:nth-child(5) { animation-delay: 0.28s; }
+  .stagger-children > *:nth-child(6) { animation-delay: 0.35s; }
+  @keyframes staggerUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Pulse glow on hover */
+  .pulse-glow:hover {
+    box-shadow: 0 0 0 0 rgba(99,102,241,0.4);
+    animation: pulseGlow 1.5s ease infinite;
+  }
+  @keyframes pulseGlow {
+    0%   { box-shadow: 0 0 0 0   rgba(99,102,241,0.35); }
+    70%  { box-shadow: 0 0 0 12px rgba(99,102,241,0); }
+    100% { box-shadow: 0 0 0 0   rgba(99,102,241,0); }
+  }
+
+  /* Shimmer loader */
+  .shimmer {
+    position: relative; overflow: hidden;
+    background: var(--surface-700);
+  }
+  .shimmer::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 1.6s ease infinite;
+  }
+  @keyframes shimmer { to { transform: translateX(100%); } }
+
+  /* Gradient border card */
+  .gradient-border {
+    position: relative;
+    background: var(--glass-bg);
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+  .gradient-border::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(99,102,241,0.5), rgba(168,85,247,0.3), transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Float animation */
+  .animate-float {
+    animation: floatEl 5s ease-in-out infinite;
+  }
+  @keyframes floatEl {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-8px); }
+  }
+
+  /* Count-up number */
+  .counter { display: inline-block; transition: all 0.5s; }
+
+  /* Slide-in from right */
+  .slide-in-right { animation: slideInRight 0.4s ease; }
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Scale-in */
+  .scale-in { animation: scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.85); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* Card hover lift */
+  .card-hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .card-hover-lift:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.4); }
+
+  /* Gradient badge */
+  .badge-gradient {
+    background: linear-gradient(135deg, var(--brand-500), #a855f7);
+    color: #fff; border-radius: 99px; padding: 0.2rem 0.75rem;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em;
+    display: inline-flex; align-items: center; gap: 0.25rem;
+  }
+
+  /* Glowing dot indicator */
+  .glow-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent-green);
+    box-shadow: 0 0 6px var(--accent-green);
+    display: inline-block;
+    animation: dotPulse 2s ease-in-out infinite;
+  }
+  @keyframes dotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.7); }
+  }
+
+  /* Typing cursor */
+  .typing::after { content: '|'; animation: blink .7s step-start infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
 }
+

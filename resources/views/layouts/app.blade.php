@@ -70,6 +70,14 @@
                 <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                 Evaluations
             </a>
+            <a href="{{ route('hod.attendance.index') }}" class="nav-item {{ request()->routeIs('hod.attendance*') ? 'active' : '' }}">
+                <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="15" x2="12" y2="15"/><line x1="12" y1="15" x2="12" y2="18"/></svg>
+                Attendance
+            </a>
+            <a href="{{ route('hod.feedback.index') }}" class="nav-item {{ request()->routeIs('hod.feedback*') ? 'active' : '' }}">
+                <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Student Feedback
+            </a>
             <a href="{{ route('hod.leaderboard') }}" class="nav-item {{ request()->routeIs('hod.leaderboard') ? 'active' : '' }}">
                 <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
                 Leaderboard
@@ -104,6 +112,14 @@
                 Workshops
             </a>
             <div class="sidebar-section-label">Insights</div>
+            <a href="{{ route('faculty.timetable') }}" class="nav-item {{ request()->routeIs('faculty.timetable') ? 'active' : '' }}">
+                <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Timetable
+            </a>
+            <a href="{{ route('faculty.feedback') }}" class="nav-item {{ request()->routeIs('faculty.feedback') ? 'active' : '' }}">
+                <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                My Feedback
+            </a>
             <a href="{{ route('faculty.leaderboard') }}" class="nav-item {{ request()->routeIs('faculty.leaderboard') ? 'active' : '' }}">
                 <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
                 Leaderboard

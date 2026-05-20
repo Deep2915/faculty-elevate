@@ -94,7 +94,7 @@
     {{-- CREATE MODAL --}}
     <div id="createModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
         <div class="modal-box" style="max-width:580px;">
-            <div class="modal-title">📝 New Evaluation</div>
+            <div class="modal-title">New Evaluation</div>
             <form method="POST" action="{{ route('hod.evaluations.store') }}">
                 @csrf
                 <div class="form-grid" style="grid-template-columns:1fr 1fr; margin-bottom:1rem;">
@@ -131,7 +131,7 @@
     {{-- EDIT MODAL --}}
     <div id="editModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
         <div class="modal-box" style="max-width:580px;">
-            <div class="modal-title">✏️ Edit Evaluation</div>
+            <div class="modal-title">Edit Evaluation</div>
             <form id="editForm" method="POST" action="">
                 @csrf @method('PUT')
                 <div class="form-grid" style="grid-template-columns:1fr 1fr; margin-bottom:1rem;">

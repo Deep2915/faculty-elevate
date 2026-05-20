@@ -4,14 +4,14 @@
     <div style="max-width:900px; margin:0 auto;">
         <div class="glass-card" style="padding:0;">
             <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--glass-border); display:flex; align-items:center; justify-content:space-between;">
-                <span class="section-title">🏆 Department Rankings</span>
+                <span class="section-title">Department Rankings</span>
                 <span class="pill pill-indigo">{{ $profiles->count() }} Faculty</span>
             </div>
             @forelse($profiles as $i => $p)
             <div style="display:flex; align-items:center; gap:1.25rem; padding:1rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
                 {{-- Rank --}}
                 <div style="width:44px; text-align:center; font-size:1.25rem; font-weight:800; flex-shrink:0;">
-                    @if($i===0)🥇@elseif($i===1)🥈@elseif($i===2)🥉
+                    @if($i===0)<span class="rank-1">1st</span>@elseif($i===1)<span class="rank-2">2nd</span>@elseif($i===2)<span class="rank-3">3rd</span>
                     @else<span style="font-size:1rem; color:var(--text-muted);">{{ $i+1 }}</span>@endif
                 </div>
 

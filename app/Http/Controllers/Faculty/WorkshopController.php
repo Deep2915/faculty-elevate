@@ -36,6 +36,6 @@ class WorkshopController extends Controller
         $user = auth()->user();
         $gamificationService->awardXP($user, (int)($ws->xp_reward ?? 50), "Registered for workshop: {$ws->title}");
 
-        return back()->with('status', "Registered for \"{$ws->title}\" — {$ws->xp_reward} XP awarded! 🎉");
+        return back()->with('status', "Registered for \"{$ws->title}\" — {$ws->xp_reward} XP awarded!");
     }
 }

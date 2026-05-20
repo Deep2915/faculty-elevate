@@ -83,7 +83,7 @@
     {{-- ── CREATE MODAL ── --}}
     <div id="createModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
         <div class="modal-box" style="max-width:600px;">
-            <div class="modal-title">📚 New Workshop</div>
+            <div class="modal-title">New Workshop</div>
             <form method="POST" action="{{ route('admin.workshops.store') }}">
                 @csrf
                 <div class="form-grid" style="grid-template-columns:1fr 1fr; margin-bottom:1rem;">
@@ -114,7 +114,7 @@
     {{-- ── EDIT MODAL ── --}}
     <div id="editWsModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
         <div class="modal-box" style="max-width:600px;">
-            <div class="modal-title">✏️ Edit Workshop</div>
+            <div class="modal-title">Edit Workshop</div>
             <form id="editWsForm" method="POST" action="">
                 @csrf @method('PUT')
                 <div class="form-grid" style="grid-template-columns:1fr 1fr; margin-bottom:1rem;">

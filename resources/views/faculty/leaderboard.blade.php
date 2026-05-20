@@ -4,7 +4,7 @@
     @if($myRank)
     <div class="glass-card" style="margin-bottom:1.5rem; border-color:rgba(99,102,241,0.4); background:rgba(99,102,241,0.08);">
         <div style="display:flex; align-items:center; gap:1rem;">
-            <div style="font-size:2.5rem;">{{ $myRank===1?'🥇':($myRank===2?'🥈':($myRank===3?'🥉':'🎖️')) }}</div>
+            <div style="font-size:1.75rem; font-weight:900; color:var(--brand-400);">{{ $myRank===1?'#1':($myRank===2?'#2':($myRank===3?'#3':'#'.$myRank)) }}</div>
             <div>
                 <div style="font-size:1rem; font-weight:700; color:var(--text-primary);">Your Global Rank: #{{ $myRank }}</div>
                 <div style="font-size:0.8125rem; color:var(--text-muted);">PI: {{ number_format(($myProfile->performance_index??0)*100,1) }}% · XP: {{ number_format($myProfile->xp??0) }} · Level {{ $myProfile->level??1 }}</div>
@@ -15,13 +15,13 @@
 
     <div class="glass-card" style="padding:0;">
         <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--glass-border);">
-            <span class="section-title">🏆 Institution Leaderboard</span>
+            <span class="section-title">Institution Leaderboard</span>
         </div>
         @forelse($profiles as $i => $p)
         @php $isMe = (string)$p->user_id === (string)auth()->id(); @endphp
         <div style="display:flex; align-items:center; gap:1.25rem; padding:0.875rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.03); {{ $isMe?'background:rgba(99,102,241,0.07);':'' }} transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='{{ $isMe?'rgba(99,102,241,0.07)':'transparent' }}'">
             <div style="width:36px;text-align:center;font-size:1.1rem;font-weight:800;flex-shrink:0;">
-                @if($i===0)🥇@elseif($i===1)🥈@elseif($i===2)🥉
+                @if($i===0)<span class="rank-1">1st</span>@elseif($i===1)<span class="rank-2">2nd</span>@elseif($i===2)<span class="rank-3">3rd</span>
                 @else<span style="color:var(--text-muted);font-size:0.9rem;">{{ $i+1 }}</span>@endif
             </div>
             <div class="avatar" style="flex-shrink:0;{{ $isMe?'border:2px solid var(--brand-500);':'' }}">{{ strtoupper(substr($p->user->name,0,1)) }}</div>

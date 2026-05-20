@@ -15,9 +15,9 @@
             <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.875rem;">
                 <div style="width:52px; height:52px; border-radius:14px; background:rgba(99,102,241,0.15); display:flex; align-items:center; justify-content:center; font-size:1.75rem; flex-shrink:0;">
                     @php
-                        $icons = ['research'=>'🔬','teaching'=>'🎓','innovation'=>'💡','attendance'=>'🏅'];
+                        $icons = ['research'=>'R','teaching'=>'T','innovation'=>'I','attendance'=>'A'];
                     @endphp
-                    {{ $icons[$badge->category] ?? '🏆' }}
+                    <span style="font-weight:800; font-size:1.1rem; color:var(--brand-400);">{{ $icons[$badge->category] ?? 'B' }}</span>
                 </div>
                 <div>
                     <div style="font-weight:700; color:var(--text-primary); font-size:0.9375rem;">{{ $badge->name }}</div>
@@ -49,7 +49,7 @@
     {{-- CREATE MODAL --}}
     <div id="createModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
         <div class="modal-box">
-            <div class="modal-title">🏅 Create Badge</div>
+            <div class="modal-title">Create Badge</div>
             <form method="POST" action="{{ route('admin.badges.store') }}">
                 @csrf
                 <div style="display:flex; flex-direction:column; gap:0.875rem; margin-bottom:1.25rem;">
@@ -76,7 +76,7 @@
     {{-- EDIT MODAL --}}
     <div id="editBadgeModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
         <div class="modal-box">
-            <div class="modal-title">✏️ Edit Badge</div>
+            <div class="modal-title">Edit Badge</div>
             <form id="editBadgeForm" method="POST" action="">
                 @csrf @method('PUT')
                 <div style="display:flex; flex-direction:column; gap:0.875rem; margin-bottom:1.25rem;">

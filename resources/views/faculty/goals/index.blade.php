@@ -2,7 +2,7 @@
     <x-slot name="header">My Goals</x-slot>
 
     <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-bottom:1.25rem;">
-        <a href="{{ route('faculty.roadmap') }}" class="btn btn-ghost">🗺️ Roadmap View</a>
+        <a href="{{ route('faculty.roadmap') }}" class="btn btn-ghost">Roadmap View</a>
         <button onclick="document.getElementById('createGoalModal').style.display='flex'" class="btn btn-primary">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             New Goal
@@ -25,7 +25,7 @@
                 <span style="font-size:0.72rem; font-weight:700; color:var(--brand-400);">{{ $pct }}%</span>
             </div>
             <div class="progress-track" style="margin-bottom:0.875rem;"><div class="progress-fill {{ $goal->status==='completed'?'green':'' }}" style="width:{{ min(100,$pct) }}%;"></div></div>
-            <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.875rem;">📅 Due {{ \Carbon\Carbon::parse($goal->target_date)->format('d M Y') }}</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.875rem;">Due {{ \Carbon\Carbon::parse($goal->target_date)->format('d M Y') }}</div>
             <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
                 <form method="POST" action="{{ route('faculty.goals.update', $goal->id) }}">
                     @csrf @method('PUT')
@@ -41,7 +41,7 @@
         </div>
         @empty
         <div class="glass-card" style="grid-column:1/-1; text-align:center; padding:3rem;">
-            <div style="font-size:2.5rem; margin-bottom:0.75rem;">🎯</div>
+            <div style="font-size:2rem; font-weight:800; color:var(--brand-400); margin-bottom:0.75rem;">&#9650;</div>
             <div style="color:var(--text-muted);">No goals yet. Set your first professional milestone!</div>
         </div>
         @endforelse
@@ -50,7 +50,7 @@
     {{-- CREATE MODAL --}}
     <div id="createGoalModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
         <div class="modal-box">
-            <div class="modal-title">🎯 New Goal</div>
+            <div class="modal-title">New Goal</div>
             <form method="POST" action="{{ route('faculty.goals.store') }}">
                 @csrf
                 <div style="display:flex; flex-direction:column; gap:0.875rem; margin-bottom:1.25rem;">

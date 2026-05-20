@@ -81,7 +81,7 @@
 
 {{-- KPI SUMMARY --}}
 <div class="section">
-  <div class="section-title">📊 Performance Summary</div>
+  <div class="section-title">Performance Summary</div>
   <div class="kpi-grid">
     <div class="kpi-box">
       <div class="kpi-val">{{ number_format(($profile->performance_index ?? 0)*100, 1) }}%</div>
@@ -104,7 +104,7 @@
 
 {{-- SCORE BREAKDOWN --}}
 <div class="section">
-  <div class="section-title">🎯 Score Breakdown</div>
+  <div class="section-title">Score Breakdown</div>
   @foreach([
     'Research Score'    => $profile->research_score    ?? 0,
     'Teaching Score'    => $profile->teaching_score    ?? 0,
@@ -126,7 +126,7 @@
 {{-- EVALUATION HISTORY --}}
 @if($evaluations->isNotEmpty())
 <div class="section">
-  <div class="section-title">📋 Evaluation History</div>
+  <div class="section-title">Evaluation History</div>
   <table>
     <thead><tr>
       <th>Period</th>
@@ -158,7 +158,7 @@
 {{-- ACHIEVEMENTS --}}
 @if($achievements->isNotEmpty())
 <div class="section">
-  <div class="section-title">🏆 Achievements & Publications</div>
+  <div class="section-title">Achievements & Publications</div>
   <table>
     <thead><tr><th>Type</th><th>Title</th><th>Journal / Body</th><th>Date</th><th>XP</th></tr></thead>
     <tbody>
@@ -179,11 +179,11 @@
 {{-- BADGES --}}
 @if($badges->isNotEmpty())
 <div class="section">
-  <div class="section-title">🥇 Badges Earned</div>
+  <div class="section-title">Badges Earned</div>
   <div class="badge-grid">
     @foreach($badges as $badge)
     <div class="badge-box">
-      <div class="badge-icon">{{ ['research'=>'🔬','teaching'=>'🎓','innovation'=>'💡','attendance'=>'🏅'][$badge->category] ?? '🏆' }}</div>
+      <div class="badge-icon">{{ ['research'=>'[R]','teaching'=>'[T]','innovation'=>'[I]','attendance'=>'[A]'][$badge->category] ?? '[B]' }}</div>
       <div class="badge-name">{{ $badge->name }}</div>
       <div class="badge-cat">{{ ucfirst($badge->category) }}</div>
     </div>
@@ -195,7 +195,7 @@
 {{-- BIO --}}
 @if(!empty($profile->bio))
 <div class="section">
-  <div class="section-title">👤 Professional Bio</div>
+  <div class="section-title">Professional Bio</div>
   <p style="font-size:11px; color:#374151; line-height:1.7;">{{ $profile->bio }}</p>
 </div>
 @endif
