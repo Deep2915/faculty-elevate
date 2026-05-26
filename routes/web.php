@@ -59,7 +59,6 @@ Route::middleware(['auth', 'role:hod'])->prefix('hod')->name('hod.')->group(func
 
     // Student Feedback
     Route::get('/feedback', [HOD\FeedbackController::class, 'index'])->name('feedback.index');
-    Route::post('/feedback/{userId}/generate-link', [HOD\FeedbackController::class, 'generateLink'])->name('feedback.generate-link');
 });
 
 // ── Faculty ──────────────────────────────────────────────────────────────

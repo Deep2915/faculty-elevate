@@ -9,6 +9,7 @@ use App\Models\Evaluation;
 use App\Models\FacultyProfile;
 use App\Models\Goal;
 use App\Models\Setting;
+use App\Models\StudentFeedback;
 use App\Models\TimetableEntry;
 use App\Models\User;
 use App\Models\WellbeingSurvey;
@@ -150,6 +151,9 @@ class DatabaseSeeder extends Seeder
 
         // ── Deep (deepkaurbhamber123@gmail.com) — Rich Demo Data ─────────────────
         $this->seedDeepUser();
+
+        // ── Anonymous Student Feedbacks ───────────────────────────────────────────
+        $this->seedStudentFeedbacks();
 
         $this->command->info('✅ Faculty Elevate seeded! Login credentials:');
         $this->command->table(['Role', 'Email', 'Password'], [
@@ -505,6 +509,124 @@ class DatabaseSeeder extends Seeder
                 'notes'         => null,
                 'surveyed_at'   => now()->subWeeks($wb['weeks_ago']),
             ]);
+        }
+    }
+
+    // ────────────────────────────────────────────────────────────────────────────
+    // Anonymous Student Feedbacks — seeded dummy data for all faculty
+    // ────────────────────────────────────────────────────────────────────────────
+    private function seedStudentFeedbacks(): void
+    {
+        // Wipe existing to avoid duplicates on re-seed
+        StudentFeedback::truncate();
+
+        $allComments = [
+            'positive' => [
+                'Excellent teaching style! Concepts are explained with real-world examples.',
+                'Very engaging sessions. The faculty makes complex topics easy to understand.',
+                'Always punctual and well-prepared. One of the best professors this semester.',
+                'Clear explanations, approachable, and genuinely cares about student learning.',
+                'Great at breaking down difficult concepts. Really helpful during office hours.',
+                'The interactive sessions make it easy to follow along and participate.',
+                'I appreciate the structured approach to delivering lectures every time.',
+                'Very responsive to doubts and always follows up to ensure we understand.',
+                'Excellent command over the subject and always up to date with industry trends.',
+                'Teaching quality has noticeably improved this semester. Keep it up!',
+                'The practical examples used in class really help connect theory to reality.',
+                'Assignments are well-designed and really test understanding, not just memory.',
+            ],
+            'neutral' => [
+                'Good overall. Could benefit from more interactive activities.',
+                'Decent teaching, but pace is sometimes too fast to keep up with.',
+                'Content is comprehensive, but slides could be more visual.',
+                'Punctuality is good, engagement could improve with more student questions.',
+                'Solid fundamentals covered. Would appreciate more real-world case studies.',
+                'Clear delivery, but lectures can feel monotonous at times.',
+                'Good knowledge of the subject. More practice problems would help.',
+                'Helpful during office hours. Classroom engagement needs improvement.',
+            ],
+            'constructive' => [
+                'Please slow down during complex derivations — we lose track quickly.',
+                'Would love more hands-on lab sessions alongside theory classes.',
+                'Sometimes hard to follow when topics shift too quickly.',
+                'Could be more encouraging when students ask basic questions.',
+                'Audio quality in online sessions could be improved.',
+            ],
+        ];
+
+        // Per-faculty feedback configuration: [email, submissions, score profile]
+        $facultyConfigs = [
+            [
+                'email'       => 'arjun@facultyelevate.test',
+                'submissions' => 14,
+                'profile'     => ['clarity' => [0.82, 0.94], 'communication' => [0.80, 0.92], 'punctuality' => [0.85, 0.96], 'engagement' => [0.75, 0.90]],
+                'comment_mix' => ['positive' => 8, 'neutral' => 4, 'constructive' => 2],
+            ],
+            [
+                'email'       => 'sana@facultyelevate.test',
+                'submissions' => 11,
+                'profile'     => ['clarity' => [0.74, 0.88], 'communication' => [0.72, 0.86], 'punctuality' => [0.78, 0.92], 'engagement' => [0.70, 0.84]],
+                'comment_mix' => ['positive' => 6, 'neutral' => 3, 'constructive' => 2],
+            ],
+            [
+                'email'       => 'raj@facultyelevate.test',
+                'submissions' => 9,
+                'profile'     => ['clarity' => [0.58, 0.74], 'communication' => [0.55, 0.70], 'punctuality' => [0.62, 0.78], 'engagement' => [0.52, 0.68]],
+                'comment_mix' => ['positive' => 3, 'neutral' => 4, 'constructive' => 2],
+            ],
+            [
+                'email'       => 'divya@facultyelevate.test',
+                'submissions' => 8,
+                'profile'     => ['clarity' => [0.42, 0.60], 'communication' => [0.40, 0.58], 'punctuality' => [0.65, 0.80], 'engagement' => [0.38, 0.55]],
+                'comment_mix' => ['positive' => 2, 'neutral' => 4, 'constructive' => 2],
+            ],
+            [
+                'email'       => 'faculty@facultyelevate.test',
+                'submissions' => 10,
+                'profile'     => ['clarity' => [0.65, 0.80], 'communication' => [0.62, 0.78], 'punctuality' => [0.70, 0.85], 'engagement' => [0.60, 0.76]],
+                'comment_mix' => ['positive' => 5, 'neutral' => 3, 'constructive' => 2],
+            ],
+            [
+                'email'       => 'deepkaurbhamber123@gmail.com',
+                'submissions' => 15,
+                'profile'     => ['clarity' => [0.84, 0.96], 'communication' => [0.82, 0.94], 'punctuality' => [0.88, 0.98], 'engagement' => [0.80, 0.95]],
+                'comment_mix' => ['positive' => 11, 'neutral' => 3, 'constructive' => 1],
+            ],
+        ];
+
+        foreach ($facultyConfigs as $config) {
+            $user = User::where('email', $config['email'])->first();
+            if (! $user) continue;
+
+            $uid = (string) $user->id;
+            $n   = $config['submissions'];
+
+            // Build comment pool for this faculty
+            $commentPool = [];
+            foreach ($config['comment_mix'] as $type => $count) {
+                $pool = $allComments[$type];
+                shuffle($pool);
+                $commentPool = array_merge($commentPool, array_slice($pool, 0, $count));
+            }
+            shuffle($commentPool);
+
+            for ($i = 0; $i < $n; $i++) {
+                $daysAgo = rand(1, 90); // Spread over last 3 months
+
+                // Generate scores within the configured range for this faculty
+                $scores = [];
+                foreach ($config['profile'] as $dim => [$min, $max]) {
+                    $scores[$dim] = round($min + lcg_value() * ($max - $min), 2);
+                }
+
+                StudentFeedback::create([
+                    'faculty_id'     => $uid,
+                    'feedback_token' => null, // No token needed — directly seeded
+                    'scores'         => $scores,
+                    'comment'        => isset($commentPool[$i]) ? $commentPool[$i] : null,
+                    'submitted_at'   => now()->subDays($daysAgo)->subHours(rand(0, 8)),
+                ]);
+            }
         }
     }
 }

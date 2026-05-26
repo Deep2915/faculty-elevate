@@ -88,6 +88,7 @@
                 <th>Performance Index</th>
                 <th>XP</th>
                 <th>Level</th>
+                <th style="text-align:center;">Feedback</th>
                 <th style="padding-right:1.5rem; text-align:right;">Report</th>
             </tr></thead>
             <tbody>
@@ -115,6 +116,12 @@
                     </td>
                     <td><span class="pill pill-amber">{{ number_format($p->xp??0) }} XP</span></td>
                     <td><span class="pill pill-indigo">Lv {{ $p->level??1 }}</span></td>
+                    <td style="text-align:center;">
+                        <a href="{{ route('hod.feedback.index') }}#faculty-{{ $p->user->id }}" class="btn btn-ghost btn-xs" title="View student feedback for {{ $p->user->name }}" style="gap:4px;">
+                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            Feedback
+                        </a>
+                    </td>
                     <td style="text-align:right; padding-right:1.5rem;">
                         <a href="{{ route('hod.report.download', $p->user->id) }}" class="btn btn-ghost btn-xs">
                             <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -124,7 +131,7 @@
                 </tr>
                 @endforeach
                 @if($topFaculty->isEmpty())
-                <tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">No evaluated faculty yet.</td></tr>
+                <tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--text-muted);">No evaluated faculty yet.</td></tr>
                 @endif
             </tbody>
         </table>

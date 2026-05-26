@@ -11,19 +11,17 @@
     .dim-bar { display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem; }
     .dim-label { font-size:0.75rem; color:var(--text-muted); width:100px; flex-shrink:0; }
     .star-avg { font-size:1.2rem; font-weight:700; }
-    .copy-btn { cursor:pointer; background:var(--surface-700); border:1px solid var(--glass-border); border-radius:8px; padding:4px 10px; font-size:0.72rem; color:var(--text-secondary); transition:all .18s; }
-    .copy-btn:hover { background:var(--brand-500); color:#fff; border-color:var(--brand-500); }
-    .link-box { background:var(--surface-700); border:1px dashed var(--glass-border); border-radius:8px; padding:8px 12px; font-size:0.75rem; color:var(--text-muted); word-break:break-all; margin-top:0.5rem; }
-    .no-link { font-size:0.78rem; color:var(--text-muted); font-style:italic; }
     .stagger-in { opacity:0; animation:staggerFade .5s ease forwards; }
     @keyframes staggerFade { to { opacity:1; transform:translateY(0); } from { opacity:0; transform:translateY(14px); } }
+    .fb-card.highlight { border-color:rgba(129,140,248,0.7); box-shadow:0 0 0 3px rgba(99,102,241,0.25), 0 12px 40px rgba(0,0,0,.35); animation:cardPulse 1.5s ease 0.5s 2; }
+    @keyframes cardPulse { 0%,100% { box-shadow:0 0 0 3px rgba(99,102,241,0.25), 0 12px 40px rgba(0,0,0,.35); } 50% { box-shadow:0 0 0 6px rgba(99,102,241,0.4), 0 16px 48px rgba(0,0,0,.45); } }
     </style>
     @endpush
 
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <div>
             <h2 style="font-size:1rem; font-weight:600; color:var(--text-primary);">Anonymous Student Feedback</h2>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Generate unique links for each faculty. Share with students — no login required.</p>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">Aggregated scores from anonymous student submissions across all faculty members.</p>
         </div>
     </div>
 
@@ -32,18 +30,17 @@
     @php
         $f       = $stat['faculty'];
         $scores  = $stat['scores'];
-        $link    = $stat['link'];
         $count   = $scores['count'] ?? 0;
         $dims    = ['clarity' => 'Clarity', 'communication' => 'Communication', 'punctuality' => 'Punctuality', 'engagement' => 'Engagement'];
         $overall = $count > 0 ? round(collect(['clarity','communication','punctuality','engagement'])->avg(fn($d) => $scores[$d] ?? 0) * 100, 1) : null;
         $pillCls = $overall !== null ? ($overall >= 75 ? 'pill-green' : ($overall >= 50 ? 'pill-amber' : 'pill-rose')) : 'pill-gray';
     @endphp
-    <div class="fb-card stagger-in" style="animation-delay:{{ $i * 0.06 }}s;">
+    <div class="fb-card stagger-in" id="faculty-{{ $f->id }}" style="animation-delay:{{ $i * 0.06 }}s; scroll-margin-top: 5rem;">
         {{-- Header --}}
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem;">
             <div class="avatar avatar-lg">{{ strtoupper(substr($f->name, 0, 1)) }}</div>
             <div style="flex:1;">
-                <div style="font-weight:700; color:var(--text-primary);">{{ $f->name }}</div>
+                <a href="{{ route('hod.evaluations.index') }}?faculty={{ $f->id }}" style="font-weight:700; color:var(--text-primary); text-decoration:none; transition:color .15s;" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color='var(--text-primary)'">{{ $f->name }}</a>
                 <div style="font-size:0.75rem; color:var(--text-muted);">{{ $f->email }}</div>
             </div>
             @if($overall !== null)
@@ -72,24 +69,12 @@
         <div style="padding:1rem 0; color:var(--text-muted); font-size:0.83rem;">No feedback submitted yet.</div>
         @endif
 
-        {{-- Link Section --}}
-        <div style="border-top:1px solid var(--glass-border); padding-top:1rem; margin-top:auto;">
-            @if($link)
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem;">
-                    <span style="font-size:0.75rem; color:var(--text-muted);">Feedback Link</span>
-                    <button class="copy-btn" onclick="copyLink('link-{{ $f->id }}')">Copy Link</button>
-                </div>
-                <div class="link-box" id="link-{{ $f->id }}">{{ $link }}</div>
-            @else
-                <div class="no-link" style="margin-bottom:0.75rem;">No feedback link yet. Generate one to share with students.</div>
-            @endif
-            <form method="POST" action="{{ route('hod.feedback.generate-link', $f->id) }}" style="margin-top:0.75rem;">
-                @csrf
-                <button type="submit" class="btn btn-ghost btn-sm" style="width:100%; justify-content:center;">
-                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                    {{ $link ? 'Regenerate Link' : 'Generate Link' }}
-                </button>
-            </form>
+        {{-- Submission Count Footer --}}
+        <div style="border-top:1px solid var(--glass-border); padding-top:0.875rem; margin-top:auto; display:flex; align-items:center; gap:0.5rem;">
+            <svg width="13" height="13" fill="none" stroke="var(--text-muted)" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span style="font-size:0.75rem; color:var(--text-muted);">
+                {{ $count }} anonymous student submission{{ $count !== 1 ? 's' : '' }} collected
+            </span>
         </div>
     </div>
     @endforeach
@@ -97,15 +82,19 @@
 
     @push('scripts')
     <script>
-    function copyLink(id) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        navigator.clipboard.writeText(el.textContent.trim()).then(() => {
-            const btn = event.target;
-            btn.textContent = '✓ Copied!';
-            setTimeout(() => btn.textContent = 'Copy Link', 2000);
-        });
-    }
+    // Highlight the card targeted via URL hash (e.g. #faculty-123)
+    window.addEventListener('load', function () {
+        const hash = window.location.hash;
+        if (hash && hash.startsWith('#faculty-')) {
+            const card = document.querySelector(hash);
+            if (card) {
+                setTimeout(() => {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    card.classList.add('highlight');
+                }, 400);
+            }
+        }
+    });
     </script>
     @endpush
 </x-app-layout>
