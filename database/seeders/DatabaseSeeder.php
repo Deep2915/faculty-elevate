@@ -4,13 +4,16 @@ namespace Database\Seeders;
 
 use App\Models\Achievement;
 use App\Models\Badge;
+use App\Models\ClassLog;
 use App\Models\Evaluation;
 use App\Models\FacultyProfile;
 use App\Models\Goal;
 use App\Models\Setting;
+use App\Models\TimetableEntry;
 use App\Models\User;
 use App\Models\WellbeingSurvey;
 use App\Models\Workshop;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -68,7 +71,7 @@ class DatabaseSeeder extends Seeder
             ]));
         }
 
-        // ── Faculty Members ──────────────────────────────────────────────────────
+        // ── Other Faculty Members ─────────────────────────────────────────────────
         $facultyData = [
             ['name' => 'Dr. Arjun Verma',    'email' => 'arjun@facultyelevate.test',    'dept' => 'Computer Science',   'desig' => 'Associate Professor', 'r' => 0.88, 't' => 0.91, 'i' => 0.75, 'xp' => 1150],
             ['name' => 'Dr. Sana Mirza',     'email' => 'sana@facultyelevate.test',     'dept' => 'Data Science',       'desig' => 'Professor',           'r' => 0.80, 't' => 0.85, 'i' => 0.70, 'xp' => 920],
@@ -83,7 +86,7 @@ class DatabaseSeeder extends Seeder
             ]);
 
             $pi = ($fd['r'] * 0.4) + ($fd['t'] * 0.4) + ($fd['i'] * 0.2);
-            $profile = FacultyProfile::updateOrCreate(['user_id' => (string) $user->id], [
+            FacultyProfile::updateOrCreate(['user_id' => (string) $user->id], [
                 'department'        => $fd['dept'],
                 'designation'       => $fd['desig'],
                 'bio'               => "Experienced educator at {$fd['dept']} department.",
@@ -97,7 +100,6 @@ class DatabaseSeeder extends Seeder
                 'rank'              => 0,
             ]);
 
-            // Evaluations
             $hodUser = User::where('email', 'hod@facultyelevate.test')->first();
             foreach (['Q1-2025', 'Q2-2025', 'Annual-2025'] as $period) {
                 Evaluation::updateOrCreate(
@@ -112,7 +114,6 @@ class DatabaseSeeder extends Seeder
                 );
             }
 
-            // Achievements
             Achievement::updateOrCreate(
                 ['faculty_id' => (string)$user->id, 'title' => 'Machine Learning in Education'],
                 [
@@ -125,7 +126,6 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            // Goals
             Goal::updateOrCreate(
                 ['faculty_id' => (string)$user->id, 'title' => 'Complete Certified Online Course'],
                 [
@@ -137,7 +137,6 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            // Wellbeing Surveys
             for ($i = 0; $i < 3; $i++) {
                 WellbeingSurvey::create([
                     'faculty_id'   => (string)$user->id,
@@ -149,11 +148,363 @@ class DatabaseSeeder extends Seeder
             }
         }
 
+        // ── Deep (deepkaurbhamber123@gmail.com) — Rich Demo Data ─────────────────
+        $this->seedDeepUser();
+
         $this->command->info('✅ Faculty Elevate seeded! Login credentials:');
         $this->command->table(['Role', 'Email', 'Password'], [
-            ['Admin',   'admin@facultyelevate.test',   'password'],
-            ['HOD',     'hod@facultyelevate.test',     'password'],
-            ['Faculty', 'faculty@facultyelevate.test', 'password'],
+            ['Admin',   'admin@facultyelevate.test',    'password'],
+            ['HOD',     'hod@facultyelevate.test',      'password'],
+            ['Faculty', 'faculty@facultyelevate.test',  'password'],
+            ['Deep',    'deepkaurbhamber123@gmail.com', 'password'],
         ]);
+    }
+
+    // ────────────────────────────────────────────────────────────────────────────
+    // Deep's rich demo data — looks like 6+ months of active portal usage
+    // ────────────────────────────────────────────────────────────────────────────
+    private function seedDeepUser(): void
+    {
+        $hodUser = User::where('email', 'hod@facultyelevate.test')->first();
+
+        // ── User account
+        $deep = User::updateOrCreate(['email' => 'deepkaurbhamber123@gmail.com'], [
+            'name'     => 'Dr. Deep Kaur',
+            'password' => Hash::make('password'),
+            'role'     => 'faculty',
+        ]);
+        $uid = (string) $deep->id;
+
+        // ── Profile
+        FacultyProfile::updateOrCreate(['user_id' => $uid], [
+            'department'        => 'Computer Science',
+            'designation'       => 'Assistant Professor',
+            'bio'               => 'Passionate about AI, data-driven pedagogy, and student-centered learning. Six years of teaching experience with a strong research background in Machine Learning and Computer Vision.',
+            'skills'            => ['Machine Learning', 'Python', 'Data Structures', 'Research', 'Pedagogy', 'Cloud Computing'],
+            'research_score'    => 0.78,
+            'teaching_score'    => 0.87,
+            'innovation_score'  => 0.72,
+            'performance_index' => round((0.78 * 0.4) + (0.87 * 0.4) + (0.72 * 0.2), 4),
+            'xp'                => 1840,
+            'level'             => 4,
+            'rank'              => 2,
+        ]);
+
+        // ── Evaluations (5 quarters — shows growth over time)
+        $evals = [
+            ['period' => 'Q3-2024', 'r' => 0.68, 't' => 0.74, 'i' => 0.58, 'months_ago' => 9,  'remarks' => 'Consistent performance. Encouraged to publish more.'],
+            ['period' => 'Q4-2024', 'r' => 0.72, 't' => 0.78, 'i' => 0.62, 'months_ago' => 6,  'remarks' => 'Noticeable improvement in teaching scores. Research paper submitted.'],
+            ['period' => 'Q1-2025', 'r' => 0.75, 't' => 0.83, 'i' => 0.67, 'months_ago' => 3,  'remarks' => 'Great progress this quarter. Research paper accepted.'],
+            ['period' => 'Q2-2025', 'r' => 0.78, 't' => 0.87, 'i' => 0.70, 'months_ago' => 1,  'remarks' => 'Excellent performance. Among top 3 in the department.'],
+            ['period' => 'Annual-2025','r' => 0.78,'t' => 0.87,'i' => 0.72,'months_ago' => 0,   'remarks' => 'Outstanding annual performance. Recommended for promotion consideration.'],
+        ];
+        foreach ($evals as $ev) {
+            $pi = ($ev['r'] * 0.4) + ($ev['t'] * 0.4) + ($ev['i'] * 0.2);
+            Evaluation::updateOrCreate(
+                ['faculty_id' => $uid, 'period' => $ev['period']],
+                [
+                    'evaluator_id'   => (string) $hodUser->id,
+                    'scores'         => ['research' => $ev['r'], 'teaching' => $ev['t'], 'innovation' => $ev['i']],
+                    'weighted_score' => round($pi, 4),
+                    'status'         => 'published',
+                    'remarks'        => $ev['remarks'],
+                    'created_at'     => now()->subMonths($ev['months_ago']),
+                ]
+            );
+        }
+
+        // ── Achievements (varied types, spread over 8 months)
+        $achievements = [
+            [
+                'title'          => 'Deep Learning for Image Classification',
+                'type'           => 'publication',
+                'journal_or_body'=> 'Springer LNCS',
+                'date'           => now()->subMonths(8)->format('Y-m-d'),
+                'xp_awarded'     => 200,
+                'verified'       => true,
+            ],
+            [
+                'title'          => 'Best Paper Award — ICAIET 2024',
+                'type'           => 'award',
+                'journal_or_body'=> 'International Conference on AI & Emerging Technologies',
+                'date'           => now()->subMonths(6)->format('Y-m-d'),
+                'xp_awarded'     => 300,
+                'verified'       => true,
+            ],
+            [
+                'title'          => 'Google TensorFlow Developer Certificate',
+                'type'           => 'certification',
+                'journal_or_body'=> 'Google',
+                'date'           => now()->subMonths(5)->format('Y-m-d'),
+                'xp_awarded'     => 150,
+                'verified'       => true,
+            ],
+            [
+                'title'          => 'Federated Learning for Privacy-Preserving Healthcare',
+                'type'           => 'publication',
+                'journal_or_body'=> 'IEEE Access',
+                'date'           => now()->subMonths(3)->format('Y-m-d'),
+                'xp_awarded'     => 200,
+                'verified'       => true,
+            ],
+            [
+                'title'          => 'Method for Optimised Neural Network Pruning',
+                'type'           => 'patent',
+                'journal_or_body'=> 'Indian Patent Office',
+                'date'           => now()->subMonths(2)->format('Y-m-d'),
+                'xp_awarded'     => 400,
+                'verified'       => true,
+            ],
+            [
+                'title'          => 'AWS Certified Machine Learning – Specialty',
+                'type'           => 'certification',
+                'journal_or_body'=> 'Amazon Web Services',
+                'date'           => now()->subMonths(1)->format('Y-m-d'),
+                'xp_awarded'     => 150,
+                'verified'       => true,
+            ],
+            [
+                'title'          => 'Transformer-Based Approach to Code Review Automation',
+                'type'           => 'publication',
+                'journal_or_body'=> 'ACM SIGSOFT',
+                'date'           => now()->subWeeks(2)->format('Y-m-d'),
+                'xp_awarded'     => 200,
+                'verified'       => false,
+            ],
+        ];
+        foreach ($achievements as $ach) {
+            Achievement::updateOrCreate(
+                ['faculty_id' => $uid, 'title' => $ach['title']],
+                array_merge($ach, ['faculty_id' => $uid, 'proof_url' => null])
+            );
+        }
+
+        // ── Goals (mix of completed, active, and upcoming)
+        $goals = [
+            [
+                'title'                 => 'Publish 3 Research Papers in 2024',
+                'description'           => 'Target high-impact journals in AI/ML domain — Springer, IEEE, ACM.',
+                'target_date'           => now()->subMonths(1)->format('Y-m-d'),
+                'milestones'            => [
+                    ['label' => 'Submit to Springer LNCS', 'done' => true],
+                    ['label' => 'Submit to IEEE Access', 'done' => true],
+                    ['label' => 'Submit to ACM SIGSOFT', 'done' => true],
+                ],
+                'completion_percentage' => 100.0,
+                'status'                => 'completed',
+            ],
+            [
+                'title'                 => 'Complete AWS ML Specialty Certification',
+                'description'           => 'Obtain the AWS Certified Machine Learning – Specialty credential.',
+                'target_date'           => now()->subWeeks(3)->format('Y-m-d'),
+                'milestones'            => [
+                    ['label' => 'Complete AWS training path', 'done' => true],
+                    ['label' => 'Practice exam (score 80%+)', 'done' => true],
+                    ['label' => 'Book and pass exam', 'done' => true],
+                ],
+                'completion_percentage' => 100.0,
+                'status'                => 'completed',
+            ],
+            [
+                'title'                 => 'Integrate AI Tools into Course Curriculum',
+                'description'           => 'Redesign Data Structures & Algorithms course with AI-assisted problem sets and auto-grading.',
+                'target_date'           => now()->addMonths(1)->format('Y-m-d'),
+                'milestones'            => [
+                    ['label' => 'Audit existing curriculum', 'done' => true],
+                    ['label' => 'Design AI-assisted assignments', 'done' => true],
+                    ['label' => 'Pilot with one batch', 'done' => false],
+                    ['label' => 'Gather feedback and iterate', 'done' => false],
+                ],
+                'completion_percentage' => 55.0,
+                'status'                => 'active',
+            ],
+            [
+                'title'                 => 'File 2 Patents in 2025',
+                'description'           => 'File patents on neural network optimisation and an AI-driven attendance prediction system.',
+                'target_date'           => now()->addMonths(4)->format('Y-m-d'),
+                'milestones'            => [
+                    ['label' => 'Complete documentation for Patent 1', 'done' => true],
+                    ['label' => 'File Patent 1 with IPO', 'done' => true],
+                    ['label' => 'Complete documentation for Patent 2', 'done' => false],
+                    ['label' => 'File Patent 2 with IPO', 'done' => false],
+                ],
+                'completion_percentage' => 50.0,
+                'status'                => 'active',
+            ],
+            [
+                'title'                 => 'Mentor 5 Students for National Hackathons',
+                'description'           => 'Guide and coach student teams for Smart India Hackathon and other national events.',
+                'target_date'           => now()->addMonths(3)->format('Y-m-d'),
+                'milestones'            => [
+                    ['label' => 'Identify and shortlist students', 'done' => true],
+                    ['label' => 'Weekly mentoring sessions', 'done' => false],
+                    ['label' => 'Submit project proposals', 'done' => false],
+                ],
+                'completion_percentage' => 30.0,
+                'status'                => 'active',
+            ],
+        ];
+        foreach ($goals as $goal) {
+            Goal::updateOrCreate(
+                ['faculty_id' => $uid, 'title' => $goal['title']],
+                array_merge($goal, ['faculty_id' => $uid])
+            );
+        }
+
+        // ── Timetable Entries (4 active classes per week)
+        $timetableEntries = [
+            [
+                'subject'     => 'Machine Learning',
+                'day_of_week' => 'Monday',
+                'time_slot'   => '09:00 – 10:00',
+                'semester'    => 'Even 2025-26',
+                'section'     => 'K23RA',
+                'room'        => 'LH-201',
+            ],
+            [
+                'subject'     => 'Data Structures & Algorithms',
+                'day_of_week' => 'Monday',
+                'time_slot'   => '11:00 – 12:00',
+                'semester'    => 'Even 2025-26',
+                'section'     => 'K24RB',
+                'room'        => 'LH-103',
+            ],
+            [
+                'subject'     => 'Artificial Intelligence',
+                'day_of_week' => 'Wednesday',
+                'time_slot'   => '10:00 – 11:00',
+                'semester'    => 'Even 2025-26',
+                'section'     => 'K23RA',
+                'room'        => 'LH-201',
+            ],
+            [
+                'subject'     => 'Machine Learning',
+                'day_of_week' => 'Wednesday',
+                'time_slot'   => '14:00 – 15:00',
+                'semester'    => 'Even 2025-26',
+                'section'     => 'K23RB',
+                'room'        => 'LH-302',
+            ],
+            [
+                'subject'     => 'Data Structures & Algorithms',
+                'day_of_week' => 'Thursday',
+                'time_slot'   => '09:00 – 10:00',
+                'semester'    => 'Even 2025-26',
+                'section'     => 'K24RB',
+                'room'        => 'LH-103',
+            ],
+            [
+                'subject'     => 'Cloud Computing',
+                'day_of_week' => 'Friday',
+                'time_slot'   => '11:00 – 12:00',
+                'semester'    => 'Even 2025-26',
+                'section'     => 'B23RA',
+                'room'        => 'Computer Lab 1',
+            ],
+            [
+                'subject'     => 'Artificial Intelligence',
+                'day_of_week' => 'Friday',
+                'time_slot'   => '14:00 – 15:00',
+                'semester'    => 'Even 2025-26',
+                'section'     => 'K23RB',
+                'room'        => 'LH-302',
+            ],
+        ];
+
+        $entryIds = [];
+        foreach ($timetableEntries as $entry) {
+            // Remove existing active entry for same faculty+day+slot to avoid conflicts
+            TimetableEntry::where('faculty_id', $uid)
+                ->where('day_of_week', $entry['day_of_week'])
+                ->where('time_slot', $entry['time_slot'])
+                ->update(['is_active' => false]);
+
+            $te = TimetableEntry::create(array_merge($entry, [
+                'faculty_id' => $uid,
+                'is_active'  => true,
+            ]));
+            $entryIds[] = (string) $te->id;
+        }
+
+        // ── Class Logs (12 weeks of history — realistic mix of conducted/cancelled)
+        // Map entry index to which days they fall on
+        $dayToEntryIndexes = [
+            'Monday'    => [0, 1],
+            'Wednesday' => [2, 3],
+            'Thursday'  => [4],
+            'Friday'    => [5, 6],
+        ];
+
+        for ($week = 11; $week >= 0; $week--) {
+            foreach ($dayToEntryIndexes as $dayName => $indexes) {
+                // Find the date of this day in the past $week weeks
+                $targetDate = Carbon::now()->subWeeks($week)->startOfWeek(Carbon::MONDAY);
+                $dayOffset  = array_search($dayName, ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']);
+                $classDate  = $targetDate->copy()->addDays($dayOffset);
+
+                // Skip future dates
+                if ($classDate->isFuture()) {
+                    continue;
+                }
+
+                foreach ($indexes as $idx) {
+                    if (!isset($entryIds[$idx])) continue;
+
+                    // 88% conducted, 8% cancelled, 4% substituted
+                    $roll = rand(1, 100);
+                    $status = $roll <= 88 ? 'conducted' : ($roll <= 96 ? 'cancelled' : 'substituted');
+                    $remarks = match ($status) {
+                        'cancelled'    => ['Medical leave', 'Conference attendance', 'Administrative duty', 'University event'][rand(0,3)],
+                        'substituted'  => 'Covered by Dr. Arjun Verma',
+                        default        => null,
+                    };
+
+                    ClassLog::updateOrCreate(
+                        [
+                            'timetable_entry_id' => $entryIds[$idx],
+                            'date'               => $classDate->copy()->startOfDay(),
+                        ],
+                        [
+                            'faculty_id' => $uid,
+                            'status'     => $status,
+                            'remarks'    => $remarks,
+                            'logged_by'  => $uid,
+                        ]
+                    );
+                }
+            }
+        }
+
+        // ── Wellbeing Surveys (10 check-ins over 5 months — shows improving trend)
+        $wellbeingEntries = [
+            ['weeks_ago' => 20, 'workload' => 8, 'stress' => 8, 'motivation' => 5, 'support' => 5, 'burnout' => 78],
+            ['weeks_ago' => 17, 'workload' => 7, 'stress' => 7, 'motivation' => 6, 'support' => 6, 'burnout' => 72],
+            ['weeks_ago' => 14, 'workload' => 7, 'stress' => 6, 'motivation' => 6, 'support' => 6, 'burnout' => 65],
+            ['weeks_ago' => 12, 'workload' => 6, 'stress' => 6, 'motivation' => 7, 'support' => 7, 'burnout' => 60],
+            ['weeks_ago' => 10, 'workload' => 6, 'stress' => 5, 'motivation' => 7, 'support' => 7, 'burnout' => 55],
+            ['weeks_ago' =>  8, 'workload' => 5, 'stress' => 5, 'motivation' => 8, 'support' => 8, 'burnout' => 50],
+            ['weeks_ago' =>  6, 'workload' => 5, 'stress' => 4, 'motivation' => 8, 'support' => 8, 'burnout' => 47],
+            ['weeks_ago' =>  4, 'workload' => 4, 'stress' => 4, 'motivation' => 9, 'support' => 8, 'burnout' => 42],
+            ['weeks_ago' =>  2, 'workload' => 4, 'stress' => 3, 'motivation' => 9, 'support' => 9, 'burnout' => 38],
+            ['weeks_ago' =>  0, 'workload' => 4, 'stress' => 3, 'motivation' => 9, 'support' => 9, 'burnout' => 35],
+        ];
+
+        // Delete old wellbeing data for Deep to avoid duplicates on re-seed
+        WellbeingSurvey::where('faculty_id', $uid)->delete();
+
+        foreach ($wellbeingEntries as $wb) {
+            WellbeingSurvey::create([
+                'faculty_id'    => $uid,
+                'responses'     => [
+                    'workload'   => $wb['workload'],
+                    'stress'     => $wb['stress'],
+                    'motivation' => $wb['motivation'],
+                    'support'    => $wb['support'],
+                ],
+                'burnout_index' => $wb['burnout'],
+                'notes'         => null,
+                'surveyed_at'   => now()->subWeeks($wb['weeks_ago']),
+            ]);
+        }
     }
 }
